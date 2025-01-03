@@ -5,6 +5,7 @@ const _ = require('lodash');
 const { StatusCodes } = require("http-status-codes");
 
 const { fetchGSTINDetails } = require('../services');
+const { isValidGSTIN } = require('../utils');
 
 
 module.exports.gstinInfo = async (req, res) => {
@@ -12,6 +13,15 @@ module.exports.gstinInfo = async (req, res) => {
     const { gstin = "" } = req.params || {};
 
     try {
+
+        const isValid = isValidGSTIN(gstin);
+
+        if (!isValid) {
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                status: false,
+                message: "Invalid GSTIN!"
+            })
+        }
 
         const htmlContent = await fetchGSTINDetails(gstin);
 
